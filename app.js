@@ -18,7 +18,8 @@ if (fs.existsSync(envPath)) {
 }
 
 // นำเข้า route modules
-const usersRouter = require('./routes/auth/users');
+const authRouter = require('./routes/auth');
+// const usersRouter = require('./routes/auth/users');
 
 const app = express();
 
@@ -40,10 +41,11 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ตั้งค่า routes
-app.use('/users', usersRouter);
+app.use('/api/auth', authRouter);
+// app.use('/users', usersRouter);
 
 app.get('/', (req, res) => {
-  res.send('API is working');
+  res.send('Welcome to Taurus Backend API');
 });
 
 // เริ่มต้น server

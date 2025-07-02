@@ -1,4 +1,4 @@
-const { pool } = require("../../database/auth");
+const { pool } = require("../../database/db");
 console.log('[DEBUG] db loaded:', typeof pool.query);
 
 exports.getUsers = (req, res) => {
@@ -29,20 +29,6 @@ exports.getUser = (req, res) => {
     }
   );
 } 
-
-exports.addUser = (req, res) => {
-  const { username, password, email } = req.body;
-  pool.query(
-    "INSERT INTO `users` (`username`, `password`, `email`) VALUES (?, ?, ?)",
-    [username, password, email],
-    function (err, results, fields) {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.status(201).json({ message: "User created successfully", userId: results.insertId });
-    }
-  );
-}
 
 exports.updateUser = (req, res) => {
   const userId = req.params.user_id;
