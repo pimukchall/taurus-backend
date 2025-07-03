@@ -42,7 +42,7 @@ exports.login = async (req, res) => {
     }
 
     // สร้าง JWT Token
-    const payload = { userId: user.id, email: user.email };
+    const payload = { userId: user.id, email: user.email, username: user.username };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 
     res.status(200).json({ message: 'เข้าสู่ระบบสำเร็จ', token });
