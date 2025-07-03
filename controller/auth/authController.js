@@ -1,4 +1,4 @@
-const dbPool = require('../../database/db');
+const dbPool = require('../../config/database');
 
 exports.addUser = async (req, res) => {
 
