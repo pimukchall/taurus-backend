@@ -18,6 +18,7 @@ if (fs.existsSync(envPath)) {
 }
 
 // นำเข้า route modules
+const authRouter = require('./routes/authRoutes');
 const usersRouter = require('./routes/userRoutes');
 
 const app = express();
@@ -40,6 +41,7 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ตั้งค่า routes
+app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 
 app.get('/', (req, res) => {
