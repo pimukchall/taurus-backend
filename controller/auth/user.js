@@ -14,9 +14,9 @@ exports.getUsers = (req, res) => {
 }
 
 exports.getUser = (req, res) => {
-  const userId = req.params.user_id;
+  const userId = req.params.id;
   pool.query(
-    "SELECT * FROM `users` WHERE `user_id` = ?",
+    "SELECT * FROM `users` WHERE `id` = ?",
     [userId],
     function (err, results, fields) {
       if (err) {
@@ -31,10 +31,10 @@ exports.getUser = (req, res) => {
 } 
 
 exports.updateUser = (req, res) => {
-  const userId = req.params.user_id;
+  const userId = req.params.id;
   const { username, password, email } = req.body;
   pool.query(
-    "UPDATE `users` SET `username` = ?, `password` = ?, `email` = ? WHERE `user_id` = ?",
+    "UPDATE `users` SET `username` = ?, `password` = ?, `email` = ? WHERE `id` = ?",
     [username, password, email, userId],
     function (err, results, fields) {
       if (err) {
@@ -49,9 +49,9 @@ exports.updateUser = (req, res) => {
 }
 
 exports.deleteUser = (req, res) => {
-  const userId = req.params.user_id;
+  const userId = req.params.id;
   pool.query(
-    "DELETE FROM `users` WHERE `user_id` = ?",
+    "DELETE FROM `users` WHERE `id` = ?",
     [userId],
     function (err, results, fields) {
       if (err) {
