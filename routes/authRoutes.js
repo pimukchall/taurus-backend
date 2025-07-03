@@ -8,7 +8,7 @@ router.post('/login', authController.login);
 router.post('/logout', authController.logout);
 
 // --- Route ที่ต้อง Login (ตัวอย่าง) ---
-router.get('/profile', verifyToken, (req, res) => {
+router.get('/me', verifyToken, (req, res) => {
   // Middleware `verifyToken` จะทำงานก่อน
   // ถ้า Token ถูกต้อง เราจะสามารถเข้าถึงข้อมูล user ได้จาก req.user
   res.json({
