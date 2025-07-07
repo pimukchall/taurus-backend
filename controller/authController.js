@@ -45,7 +45,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: validationError });
     }
 
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     // 2. Check if user exists
     const user = await userModel.findUserByEmail(email);
@@ -61,10 +61,27 @@ exports.login = async (req, res) => {
 
     // 4. Create and sign JWT
     const payload = { userId: user.id, email: user.email, username: user.username };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+    const expiresIn = rememberMe ? '7d' : '1d';
+    console.log('🧪 rememberMe:', rememberMe);
+    console.log('🕒 expiresIn to be used in jwt:', expiresIn);
+
+    const token = jwt.sign(
+      payload, 
+      process.env.JWT_SECRET, 
+      { expiresIn: expiresIn });
 
     // 5. Send token to client
-    res.status(200).json({ message: 'เข้าสู่ระบบสำเร็จ', token });
+    res.status(200).json({
+      message: 'เข้าสู่ระบบสำเร็จ',
+      token: token,
+      expiresIn: expiresIn,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email
+      }
+    });
 
   } catch (error) {
     console.error("Login Error:", error);

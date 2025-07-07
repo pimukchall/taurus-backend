@@ -9,11 +9,13 @@ router.post('/logout', authController.logout);
 
 // --- Route ที่ต้อง Login (ตัวอย่าง) ---
 router.get('/me', verifyToken, (req, res) => {
-  // Middleware `verifyToken` จะทำงานก่อน
-  // ถ้า Token ถูกต้อง เราจะสามารถเข้าถึงข้อมูล user ได้จาก req.user
-  res.json({
-    message: 'ยินดีต้อนรับสู่โปรไฟล์ของคุณ',
-    user: req.user
+  res.status(200).json({
+    message: 'ข้อมูลผู้ใช้',
+    user: {
+      id: req.user.userId,
+      email: req.user.email,
+      username: req.user.username
+    }
   });
 });
 
