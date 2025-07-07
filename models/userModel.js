@@ -15,9 +15,9 @@ exports.findById = async (id) => {
 };
 
 // ฟังก์ชันสำหรับสร้างผู้ใช้ใหม่
-exports.createUser = async (email, hashedPassword) => {
-  const sql = "INSERT INTO users (email, password, created_at) VALUES (?, ?, ?)";
-  const [result] = await pool.query(sql, [email, hashedPassword, new Date()]);
+exports.createUser = async (username, email, hashedPassword) => {
+  const sql = "INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, ?)";
+  const [result] = await pool.query(sql, [username, email, hashedPassword, new Date()]);
   return result.insertId;
 };
 
@@ -27,3 +27,23 @@ exports.findUserByEmail = async (email) => {
   const [rows] = await pool.query(sql, [email]);
   return rows[0] || null;
 };
+
+exports.findUserByUsername = async (username) => {
+  const sql = "SELECT * FROM users WHERE username = ? LIMIT 1";
+  const [rows] = await pool.query(sql, [username]);
+  return rows[0] || null;
+};
+
+// ฟังก์ชันสำหรับอัปเดตข้อมูลผู้ใช้
+exports.updateUser = async (id, username, email) => {
+  const sql = "UPDATE users SET username = ?, email = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [username, email, id]);
+  return result.affectedRows > 0;
+}
+
+// ฟังก์ชันสำหรับลบผู้ใช้
+exports.deleteUser = async (id) => {
+  const sql = "DELETE FROM users WHERE id = ?";
+  const [result] = await pool.query(sql, [id]);
+  return result.affectedRows > 0;
+}
