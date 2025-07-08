@@ -2,14 +2,14 @@ const pool = require('../config/database').pool;
 
 // ฟังก์ชันสำหรับดึงข้อมูลผู้ใช้ทั้งหมด
 exports.findAll = async () => {
-  const query = "SELECT id, username, email, created_at FROM `users`";
+  const query = "SELECT id, username, email, created_at, updatedAt FROM `users`";
   const [rows] = await pool.query(query);
   return rows;
 };
 
 // ฟังก์ชันสำหรับดึงข้อมูลผู้ใช้ด้วย ID
 exports.findById = async (id) => {
-  const query = "SELECT id, username, email, created_at FROM `users` WHERE id = ?";
+  const query = "SELECT id, username, email, createdAt, updatedAt FROM `users` WHERE id = ?";
   const [rows] = await pool.query(query, [id]);
   return rows[0] || null;
 };

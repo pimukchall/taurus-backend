@@ -91,23 +91,21 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.me = (req, res) => {
-  try {
-    res.status(200).json({
-      message: 'ข้อมูลผู้ใช้',
-      user: {
-        userId: req.user.userId,
-        email: req.user.email,
-        username: req.user.username,
-        createdAt: req.user.createdAt,
-        updatedAt: req.user.updatedAt
-      }
-    });
+exports.me = async (req, res) => {
+  const userFromDb = await userModel.findById(req.user.userId);
+  if (!userFromDb) {
+    return res.status(404).json({ message: 'ไม่พบผู้ใช้' });
   }
-  catch (error) {
-    console.error("Me Error:", error);
-    res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
-  }
+  res.status(200).json({
+    message: 'ข้อมูลผู้ใช้',
+    user: {
+      userId: userFromDb.id,
+      username: userFromDb.username,
+      email: userFromDb.email,
+      createdAt: userFromDb.createdAt,
+      updatedAt: userFromDb.updatedAt
+    }
+  });
 }
 
 const { tokenDenylist } = require('../middleware/authMiddleware');
