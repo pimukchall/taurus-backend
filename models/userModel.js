@@ -16,8 +16,8 @@ exports.findById = async (id) => {
 
 // ฟังก์ชันสำหรับสร้างผู้ใช้ใหม่
 exports.createUser = async (username, email, hashedPassword) => {
-  const sql = "INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, ?)";
-  const [result] = await pool.query(sql, [username, email, hashedPassword, new Date()]);
+  const sql = "INSERT INTO users (username, email, password, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)";
+  const [result] = await pool.query(sql, [username, email, hashedPassword, new Date(), new Date()]);
   return result.insertId;
 };
 

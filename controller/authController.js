@@ -77,9 +77,11 @@ exports.login = async (req, res) => {
       token: token,
       expiresIn: expiresIn,
       user: {
-        id: user.id,
+        userId: user.id,
         username: user.username,
-        email: user.email
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
       }
     });
 
@@ -88,6 +90,25 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
   }
 };
+
+exports.me = (req, res) => {
+  try {
+    res.status(200).json({
+      message: 'ข้อมูลผู้ใช้',
+      user: {
+        userId: req.user.userId,
+        email: req.user.email,
+        username: req.user.username,
+        createdAt: req.user.createdAt,
+        updatedAt: req.user.updatedAt
+      }
+    });
+  }
+  catch (error) {
+    console.error("Me Error:", error);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
+  }
+}
 
 const { tokenDenylist } = require('../middleware/authMiddleware');
 
