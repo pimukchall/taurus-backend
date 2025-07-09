@@ -43,7 +43,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ตั้งค่า routes
 app.use('/auth', authRouter);
-app.use('/contact', contactRouter);
+app.use('/contact-requests', contactRouter);
 app.use('/users', usersRouter);
 
 app.get('/', (req, res) => {
