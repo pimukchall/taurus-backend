@@ -41,9 +41,9 @@ exports.getContactRequestById = async (req, res) => {
 }
 
 exports.createContactRequest = async (req, res) => {
-  const { fullName, email, phone, budget, location, additionalDetails, acceptTerms, services } = req.body;
+  const { fullName, email, phone, budget, area, location, additionalDetails, acceptTerms, services } = req.body;
   try {
-    const newContactRequest = await contactModel.createContactRequest(fullName, email, phone, budget, location, additionalDetails, acceptTerms, services);
+    const newContactRequest = await contactModel.createContactRequest(fullName, email, phone, budget, area, location, additionalDetails, acceptTerms, services);
     res.status(201).json({
       status: 'success',
       data: { contactRequest: newContactRequest }

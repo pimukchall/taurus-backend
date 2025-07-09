@@ -8,6 +8,7 @@ exports.findAllContactRequests = async () => {
       cr.email,
       cr.phone,
       cr.budget,
+      cr.area,
       cr.location,
       cr.additional_details,
       cr.accept_terms,
@@ -33,6 +34,7 @@ exports.findContactRequestById = async (id) => {
       cr.email,
       cr.phone,
       cr.budget,
+      cr.area,
       cr.location,
       cr.additional_details,
       cr.accept_terms,
@@ -55,6 +57,7 @@ exports.createContactRequest = async (
   email,
   phone,
   budget,
+  area,
   location,
   additionalDetails,
   acceptTerms,
@@ -66,12 +69,13 @@ exports.createContactRequest = async (
       email, 
       phone,
       budget,
+      area,
       location,
       additional_details,
       accept_terms,
       created_at
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
 
   const [result] = await pool.query(sql, [
@@ -79,6 +83,7 @@ exports.createContactRequest = async (
     email,
     phone,
     budget,
+    area,
     location,
     additionalDetails,
     acceptTerms,
