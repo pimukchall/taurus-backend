@@ -1,5 +1,6 @@
-const mysql = require('mysql2/promise');
 require('dotenv').config();
+
+const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
@@ -16,24 +17,4 @@ const pool = mysql.createPool({
   keepAliveInitialDelay: 0,
 });
 
-pool.getConnection()
-  .then(connection => {
-    console.log('✅ Database connected successfully!');
-    connection.release(); // คืน connection กลับสู่ pool
-  })
-  .catch(err => {
-    console.error('❌ Unable to connect to the database:', err);
-});
-
-module.exports = {
-  pool,
-  query: async (sql, params) => {
-    const [rows] = await pool.query(sql, params);
-    return rows;
-  },
-  close: async () => {
-    await pool.end();
-    console.log('Database connection pool closed.');
-  }
-};
-
+module.exports = { pool };

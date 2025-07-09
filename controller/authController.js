@@ -1,11 +1,16 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/userModel');
-const { validateRegisterInput, validateLoginInput, validateForgotPasswordInput, validateResetPasswordInput } = require('../validators/authValidator');
+const {
+  validateRegisterInput,
+  validateLoginInput,
+  validateForgotPasswordInput,
+  validateResetPasswordInput
+} = require('../validators/authValidator');
+const { tokenDenylist } = require('../middleware/authMiddleware');
 
 exports.register = async (req, res) => {
   try {
-    // 1. Validate user input
     const validationError = validateRegisterInput(req.body);
     if (validationError) {
       return res.status(400).json({ message: validationError });
@@ -13,7 +18,6 @@ exports.register = async (req, res) => {
 
     const { username, email, password } = req.body;
 
-    // 2. Check for existing users
     const existingUserByEmail = await userModel.findUserByEmail(email);
     if (existingUserByEmail) {
       return res.status(409).json({ message: 'อีเมลนี้ถูกใช้งานแล้ว' });
@@ -24,22 +28,18 @@ exports.register = async (req, res) => {
       return res.status(409).json({ message: 'ชื่อผู้ใช้นี้ถูกใช้งานแล้ว' });
     }
 
-    // 3. Hash password and create user
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userId = await userModel.createUser(username, email, hashedPassword); 
+    const userId = await userModel.createUser(username, email, hashedPassword);
 
-    // 4. Send success response
     res.status(201).json({ message: 'สมัครสมาชิกสำเร็จ', userId });
-
   } catch (error) {
-    console.error("Register Error:", error); 
+    console.error("Register Error:", error);
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
   }
 };
 
 exports.login = async (req, res) => {
   try {
-    // 1. Validate user input using the refactored validator
     const validationError = validateLoginInput(req.body);
     if (validationError) {
       return res.status(400).json({ message: validationError });
@@ -47,44 +47,37 @@ exports.login = async (req, res) => {
 
     const { email, password, rememberMe } = req.body;
 
-    // 2. Check if user exists
     const user = await userModel.findUserByEmail(email);
     if (!user) {
       return res.status(401).json({ message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
     }
 
-    // 3. Check if password is correct
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
     }
 
-    // 4. Create and sign JWT
-    const payload = { userId: user.id, email: user.email, username: user.username };
+    const payload = {
+      userId: user.id,
+      email: user.email,
+      username: user.username,
+    };
 
     const expiresIn = rememberMe ? '7d' : '1d';
-    console.log('🧪 rememberMe:', rememberMe);
-    console.log('🕒 expiresIn to be used in jwt:', expiresIn);
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
 
-    const token = jwt.sign(
-      payload, 
-      process.env.JWT_SECRET, 
-      { expiresIn: expiresIn });
-
-    // 5. Send token to client
     res.status(200).json({
       message: 'เข้าสู่ระบบสำเร็จ',
-      token: token,
-      expiresIn: expiresIn,
+      token,
+      expiresIn,
       user: {
         userId: user.id,
         username: user.username,
         email: user.email,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
-      }
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+      },
     });
-
   } catch (error) {
     console.error("Login Error:", error);
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
@@ -92,23 +85,27 @@ exports.login = async (req, res) => {
 };
 
 exports.me = async (req, res) => {
-  const userFromDb = await userModel.findById(req.user.userId);
-  if (!userFromDb) {
-    return res.status(404).json({ message: 'ไม่พบผู้ใช้' });
-  }
-  res.status(200).json({
-    message: 'ข้อมูลผู้ใช้',
-    user: {
-      userId: userFromDb.id,
-      username: userFromDb.username,
-      email: userFromDb.email,
-      createdAt: userFromDb.createdAt,
-      updatedAt: userFromDb.updatedAt
+  try {
+    const user = await userModel.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'ไม่พบผู้ใช้' });
     }
-  });
-}
 
-const { tokenDenylist } = require('../middleware/authMiddleware');
+    res.status(200).json({
+      message: 'ข้อมูลผู้ใช้',
+      user: {
+        userId: user.id,
+        username: user.username,
+        email: user.email,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+      },
+    });
+  } catch (err) {
+    console.error("Me Error:", err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
+  }
+};
 
 exports.logout = (req, res) => {
   try {
@@ -118,7 +115,7 @@ exports.logout = (req, res) => {
     if (token) {
       tokenDenylist.add(token);
     }
-    
+
     res.status(200).json({ message: 'ออกจากระบบสำเร็จ' });
   } catch (error) {
     console.error("Logout Error:", error);
