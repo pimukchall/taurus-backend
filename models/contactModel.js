@@ -1,42 +1,22 @@
-// const { pool } = require('../config/database');
+const { pool } = require("../config/database");
 
-// exports.createContactRequest = async (
-//   conn,
-//   full_name,
-//   email,
-//   phone,
-//   budget,
-//   location,
-//   additional_details,
-//   accept_terms
-// ) => {
-//   const sql = `
-//     INSERT INTO contact_requests 
-//     (full_name, email, phone, budget, location, additional_details, accept_terms, created_at)
-//     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-//   `;
+exports.findAllContactRequests = async () => {
+  const sql = `
+    SELECT
+    cr.id AS contact_request_id,
+    cr.full_name,
+    cr.email,
+    cr.phone,
+    cr.created_at,
+    GROUP_CONCAT(rs.name_th ORDER BY rs.name_th SEPARATOR ', ') AS services_th,
+    GROUP_CONCAT(rs.name_en ORDER BY rs.name_en SEPARATOR ', ') AS services_en
+    FROM contact_requests cr
+    LEFT JOIN contact_request_services crs ON cr.id = crs.contact_request_id
+    LEFT JOIN request_services rs ON crs.service_id = rs.id
+    GROUP BY cr.id
+    ORDER BY cr.created_at DESC;
+    `;
 
-//   const [result] = await conn.query(sql, [
-//     full_name,
-//     email,
-//     phone,
-//     budget,
-//     location,
-//     additional_details,
-//     accept_terms ? 1 : 0,
-//     new Date(),
-//   ]);
-
-//   return result.insertId;
-// };
-
-// exports.linkServicesToContact = async (conn, contactId, serviceIds) => {
-//   const sql = `
-//     INSERT INTO contact_request_services (contact_request_id, service_id)
-//     VALUES (?, ?)
-//   `;
-
-//   for (const serviceId of serviceIds) {
-//     await conn.query(sql, [contactId, serviceId]);
-//   }
-// };
+  const [rows] = await pool.query(sql);
+  return rows;
+};
